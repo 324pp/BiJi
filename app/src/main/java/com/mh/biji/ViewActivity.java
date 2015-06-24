@@ -6,10 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,27 +23,40 @@ public class ViewActivity extends Activity {
     private String bjPath;
     private int bjPage = 1;
 
+    private String path;
     private SQLiteDatabase sql;
 
-    private AreaView AV;
-
+    private ImageView IV;
+    private Bitmap baseBitmap;
+    private Canvas cvs;
+    private Paint paint;
     private int curColor;
+
+    private float X;
+    private float Y;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
-        AV = (AreaView)findViewById(R.id.AV);
-        AV.setOnTouchListener(new View.OnTouchListener() {
+        curColor = Color.parseColor("#000000");
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(curColor);
+
+        baseBitmap = Bitmap.createBitmap(IV.getWidth(), IV.getHeight(), Bitmap.Config.ARGB_8888);
+        cvs = new Canvas(baseBitmap);
+        cvs.drawColor(Color.WHITE);
+
+        IV = (ImageView)findViewById(R.id.IV);
+        IV.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean  onTouch(View v, MotionEvent event) {
-                huaDot(event);
+                touch(event);
                 return true;
             }
         });
-
-        curColor = Color.parseColor("#000000");
 
         //初始化数据
         MyApp app = (MyApp)getApplication();
@@ -47,7 +64,7 @@ public class ViewActivity extends Activity {
         bjId = intent.getStringExtra("ID");
         bjPath = intent.getStringExtra("PATH");
         if (bjPath == null || bjPath == "") bjPath = app.getBjPath();
-        String path = bjPath + "/" + app.getBjFolder() + "/" + bjId;
+        path = bjPath + "/" + app.getBjFolder() + "/" + bjId;
         File p = new File(path);
         File f = new File(path + "/" + app.getBjDBName());
         if(!p.exists()) {
@@ -62,7 +79,6 @@ public class ViewActivity extends Activity {
                 f.createNewFile();
                 sql = SQLiteDatabase.openOrCreateDatabase(f, null);
                 createMasterTable();
-                createPageTable(1);
             }catch (IOException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
@@ -75,43 +91,25 @@ public class ViewActivity extends Activity {
     }
 
     //画点
-    private void huaDot(MotionEvent event) {
-        int x = (int)event.getX();
-        int y = (int)event.getY();
-
-        switch (event.getAction()) {
+    private void touch(MotionEvent event) {
+       switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                touchStart(x, y);
-                touchIng(x, y);
-                AV.reDraw();
+                X = event.getX();
+                Y = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                touchIng(x, y);
-                AV.reDraw();
+                float X2 = event.getX();
+                float Y2 = event.getY();
+                cvs.drawLine(X, Y, X2, Y2, paint);
+                X = X2;
+                Y = Y2;
+                IV.setImageBitmap(baseBitmap);
                 break;
             case MotionEvent.ACTION_UP:
-                touchEnd(x, y);
-                AV.reDraw();
                 break;
+           default:
+               break;
         }
-
-        AV.addDot(x, y, curColor);
-    }
-
-    private void touchStart(int x, int y) {
-
-    }
-
-    private void touchIng(int x, int y) {
-
-    }
-
-    private void touchEnd(int x, int y) {
-
-    }
-
-    private void huaDot(int x, int y) {
-        AV.addDot(x, y, curColor);
     }
 
     //打开页
@@ -121,15 +119,7 @@ public class ViewActivity extends Activity {
         String s = "select x, y, c from page" + page + " order by id;";
         Cursor cur = sql.rawQuery(s, null);
 
-        if (cur != null) {
-            while (cur.moveToNext()) {//直到返回false说明表中到了数据末尾
-                int x = cur.getInt(0);
-                int y = cur.getInt(1);
-                int c = cur.getInt(2);
-                AV.toDot(x, y, c);
-            }
-            AV.reDraw();
-        }
+
     }
 
     //判断页面存在
@@ -149,7 +139,7 @@ public class ViewActivity extends Activity {
     private void createPageTable(int page) {
         String s = "insert into indexTable(id) values(" + page + ");";
         sql.execSQL(s);
-        s = "create table page" + page + "(id integer primary key AUTOINCREMENT, createdate timestamp default (datetime('now', 'localtime')), status integer default 1, x integer, y integer, c integer);";
+        s = "create table page" + page + "(id integer primary key AUTOINCREMENT, createdate timestamp default (datetime('now', 'localtime')), status integer default 1, x NUMERIC, y NUMERIC, c integer);";
         sql.execSQL(s);
     }
 
