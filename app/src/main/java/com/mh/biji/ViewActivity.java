@@ -45,10 +45,6 @@ public class ViewActivity extends Activity {
         paint.setAntiAlias(true);
         paint.setColor(curColor);
 
-        baseBitmap = Bitmap.createBitmap(IV.getWidth(), IV.getHeight(), Bitmap.Config.ARGB_8888);
-        cvs = new Canvas(baseBitmap);
-        cvs.drawColor(Color.WHITE);
-
         IV = (ImageView)findViewById(R.id.IV);
         IV.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -94,6 +90,11 @@ public class ViewActivity extends Activity {
     private void touch(MotionEvent event) {
        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if (baseBitmap == null) {
+                    baseBitmap = Bitmap.createBitmap(IV.getWidth(), IV.getHeight(), Bitmap.Config.ARGB_8888);
+                    cvs = new Canvas(baseBitmap);
+                    cvs.drawColor(Color.WHITE);
+                }
                 X = event.getX();
                 Y = event.getY();
                 break;
@@ -112,14 +113,40 @@ public class ViewActivity extends Activity {
         }
     }
 
+    //保持画面到表
+    private void saveLine(int x, int y, int x2, int y2) {
+        String s = "insert into page" + bjPage + "(x, y, x2, y2, c) values (?,?,?,?,?);";
+        sql.execSQL(s, new Object[]{x, y, x2, y2, curColor});
+    }
+
     //打开页
     private void openOrCreatePage(int page) {
         if(!isExistsPage(page)) createPageTable(page);
 
-        String s = "select x, y, c from page" + page + " order by id;";
+        String s = "select x, y, x2, y2, c from page" + page + " order by id;";
         Cursor cur = sql.rawQuery(s, null);
 
+        int a = IV.getWidth();
+        int d = IV.getHeight();
+        if (baseBitmap == null) {
+            baseBitmap = Bitmap.createBitmap(IV.getWidth(), IV.getHeight(), Bitmap.Config.ARGB_8888);
+            cvs = new Canvas(baseBitmap);
+            cvs.drawColor(Color.WHITE);
+        }
 
+        if (cur != null) {
+            while (cur.moveToNext()) {//直到返回false说明表中到了数据末尾
+                float x = cur.getFloat(0);
+                float y = cur.getFloat(1);
+                float x2 = cur.getFloat(2);
+                float y2 = cur.getFloat(3);
+                int c = cur.getInt(4);
+                paint.setColor(c);
+                cvs.drawLine(x, y, x2, y2, paint);
+            }
+            IV.setImageBitmap(baseBitmap);
+            paint.setColor(curColor);
+        }
     }
 
     //判断页面存在
@@ -139,7 +166,7 @@ public class ViewActivity extends Activity {
     private void createPageTable(int page) {
         String s = "insert into indexTable(id) values(" + page + ");";
         sql.execSQL(s);
-        s = "create table page" + page + "(id integer primary key AUTOINCREMENT, createdate timestamp default (datetime('now', 'localtime')), status integer default 1, x NUMERIC, y NUMERIC, c integer);";
+        s = "create table page" + page + "(id integer primary key AUTOINCREMENT, createdate timestamp default (datetime('now', 'localtime')), status integer default 1, x NUMERIC, y NUMERIC, x2 NUMERIC, y2 NUMERIC, c integer);";
         sql.execSQL(s);
     }
 

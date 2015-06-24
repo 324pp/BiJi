@@ -30,7 +30,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void newBiJi() {
         Intent intent = new Intent(this, ViewActivity.class);
-        intent.putExtra("ID", Fn.getGuid());
+        //intent.putExtra("ID", Fn.getGuid());
+        intent.putExtra("ID", "test");
         startActivity(intent);
     }
 
