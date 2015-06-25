@@ -23,6 +23,7 @@
         </activity>
         <activity
             android:name=".ViewActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:label="@string/title_activity_view" >
         </activity>
     </application>

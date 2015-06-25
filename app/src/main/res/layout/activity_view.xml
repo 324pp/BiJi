@@ -11,17 +11,120 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true">
 
+        <Space
+            android:layout_width="fill_parent"
+            android:layout_height="3dp" />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="30dp"
+            android:layout_height="25dp"
             android:layout_gravity="right"
-            android:id="@+id/TB"></LinearLayout>
+            android:id="@+id/TB">
+
+            <Space
+                android:layout_width="5dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/home"
+                android:src="@drawable/home_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/config"
+                android:src="@drawable/cog_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/add"
+                android:src="@drawable/plus_alt_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/del"
+                android:src="@drawable/x_alt_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="20dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/first"
+                android:src="@drawable/first_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/left"
+                android:src="@drawable/arrow_left_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/right"
+                android:src="@drawable/arrow_right_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="fill_parent" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/last"
+                android:src="@drawable/last_32x32"
+                android:onClick="onButtonMethod" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="fill_parent" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="fill_parent"
+            android:layout_height="3dp" />
 
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/IV"
+            android:hardwareAccelerated="false"
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
