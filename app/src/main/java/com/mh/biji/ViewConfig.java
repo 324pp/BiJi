@@ -18,17 +18,14 @@ import android.widget.Toast;
 public class ViewConfig extends PopupWindow {
 
     private View conentView;
-    private MyApp app;
 
-    private int lineWidth;
-    private int lineColor;
-    private int bgColor;
+    public int lineWidth;
+    public int lineColor;
+    public int bgColor;
 
     public ViewConfig(final Activity context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         conentView = inflater.inflate(R.layout.view_popup, null);
-
-        app = (MyApp)conentView.getContext().getApplication();
 
         //int h = context.getWindowManager().getDefaultDisplay().getHeight();
         //int w = context.getWindowManager().getDefaultDisplay().getWidth();
@@ -87,16 +84,4 @@ public class ViewConfig extends PopupWindow {
         //morePopWindow.showPopupWindow(v);
     }
 
-    //全局参数
-    private void setParam() {
-        app.setBgColor(bgColor);
-        app.setLineColor(curColor);
-        app.setLineWidth(lineWidth);
-    }
-
-    private void getParam() {
-        bgColor = app.getBgColor();
-        curColor = app.getLineColor();
-        lineWidth = app.getLineWidth();
-    }
 }
