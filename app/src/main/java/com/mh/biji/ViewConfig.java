@@ -12,30 +12,30 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 public class ViewConfig extends PopupWindow {
 
     private View conentView;
-
-    public int lineWidth;
-    public int lineColor;
-    public int bgColor;
+    private ViewActivity VA;
 
     public ViewConfig(final Activity context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         conentView = inflater.inflate(R.layout.view_popup, null);
+
+        VA = (ViewActivity)context;
 
         //int h = context.getWindowManager().getDefaultDisplay().getHeight();
         //int w = context.getWindowManager().getDefaultDisplay().getWidth();
         // 设置SelectPicPopupWindow的View
         this.setContentView(conentView);
         // 设置SelectPicPopupWindow弹出窗体的宽
-        this.setWidth(250);
+        this.setWidth(300);
         // 设置SelectPicPopupWindow弹出窗体的高
         //this.setHeight(LayoutParams.WRAP_CONTENT);
-        this.setHeight(500);
+        this.setHeight(150);
         // 设置SelectPicPopupWindow弹出窗体可点击
         this.setFocusable(true);
         this.setOutsideTouchable(true);
@@ -49,23 +49,75 @@ public class ViewConfig extends PopupWindow {
         // 设置SelectPicPopupWindow弹出窗体动画效果
         //this.setAnimationStyle(R.style.AnimationPreview);
 
-        Spinner mSpinner = (Spinner)conentView.findViewById(R.id.spinner1);
+        onInital();
+    }
+
+    public void onInital() {
+        Spinner bgcolor = (Spinner)conentView.findViewById(R.id.bgcolor);
+        Spinner linecolor = (Spinner)conentView.findViewById(R.id.linecolor);
+        SeekBar linewidth = (SeekBar)conentView.findViewById(R.id.linewidth);
         //  建立Adapter绑定数据源
         ColorAdapter _MyAdapter=new ColorAdapter(conentView.getContext());
         //绑定Adapter
-        mSpinner.setAdapter(_MyAdapter);
-        mSpinner.setSelection(3);
-        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        bgcolor.setAdapter(_MyAdapter);
+        int bgIndex = (new ColorItem()).indexOf(VA.getBgColor());
+        if (bgIndex < 0) bgIndex = 0;
+        bgcolor.setSelection(bgIndex);
+        bgcolor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                 int position, long id) {
-                int str = (int)parent.getItemAtPosition(position);
-
+                int s = (int)parent.getItemAtPosition(position);
+                VA.setBgColor(s);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // TODO Auto-generated method stub
+            }
+        });
+
+        linecolor.setAdapter(_MyAdapter);
+        int lineIndex = (new ColorItem()).indexOf(VA.getLineColor());
+        if (lineIndex < 0) lineIndex = 0;
+        linecolor.setSelection(lineIndex);
+        linecolor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                int s = (int)parent.getItemAtPosition(position);
+                VA.setLineColor(s);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        linewidth.setProgress(VA.getLineWidth());
+        linewidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            /**
+             * 拖动条停止拖动的时候调用
+             */
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+            /**
+             * 拖动条开始拖动的时候调用
+             */
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+            /**
+             * 拖动条进度改变的时候调用
+             */
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                VA.setLineWidth(progress);
             }
         });
     }

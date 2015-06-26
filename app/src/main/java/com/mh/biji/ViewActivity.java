@@ -31,15 +31,46 @@ public class ViewActivity extends Activity {
     private String path;
     private SQLiteDatabase sql;
 
-    private MyApp app;
-
     private ImageView IV;
     private Bitmap baseBitmap;
     private Canvas cvs;
     private Paint linePaint;
-    private int lineWidth;
-    private int curColor;
-    private int bgColor;
+
+    public void setLineWidth(int lineWidth) {
+        if (this.lineWidth == lineWidth) return;
+        this.lineWidth = lineWidth;
+        linePaint.setStrokeWidth(lineWidth);
+    }
+
+    public void setLineColor(int curColor) {
+        if (this.curColor == curColor) return;
+        this.curColor = curColor;
+        linePaint.setColor(curColor);
+    }
+
+    public void setBgColor(int bgColor) {
+        if (this.bgColor == bgColor) return;
+        this.bgColor = bgColor;
+        cvs.drawColor(bgColor);
+        IV.setImageBitmap(baseBitmap);
+        openOrCreatePage();
+    }
+
+    public int getLineWidth() {
+        return lineWidth;
+    }
+
+    public int getLineColor() {
+        return curColor;
+    }
+
+    public int getBgColor() {
+        return bgColor;
+    }
+
+    private int lineWidth = 2;
+    private int curColor = Color.BLACK;
+    private int bgColor = Color.WHITE;
 
     private float X;
     private float Y;
@@ -50,12 +81,11 @@ public class ViewActivity extends Activity {
         setContentView(R.layout.activity_view);
 
         //初始化数据
-        app = (MyApp)getApplication();
+        MyApp app = (MyApp)getApplication();
         Intent intent = getIntent();
         bjId = intent.getStringExtra("ID");
         bjPath = intent.getStringExtra("PATH");
         if (bjPath == null || bjPath == "") bjPath = app.getBjPath();
-        getParam();
 
         linePaint = new Paint(Paint.DITHER_FLAG);
         linePaint.setAntiAlias(true);
@@ -108,19 +138,6 @@ public class ViewActivity extends Activity {
         openOrCreatePage();
     }
 
-    //全局参数
-    private void setParam() {
-        app.setBgColor(bgColor);
-        app.setLineColor(curColor);
-        app.setLineWidth(lineWidth);
-    }
-
-    private void getParam() {
-        bgColor = app.getBgColor();
-        curColor = app.getLineColor();
-        lineWidth = app.getLineWidth();
-    }
-
     //菜单事件
     public void onButtonMethod(View v) {
         switch (v.getId()) {
@@ -128,8 +145,8 @@ public class ViewActivity extends Activity {
                 closeWindow();
                 break;
             case R.id.config:
-                ViewConfig morePopWindow = new ViewConfig(ViewActivity.this);
-                morePopWindow.showPopupWindow(v);
+                ViewConfig configWindow = new ViewConfig(ViewActivity.this);
+                configWindow.showPopupWindow(v);
                 break;
             case R.id.add:
                 changePageNum(1);
@@ -137,6 +154,7 @@ public class ViewActivity extends Activity {
                 break;
             case R.id.del:
                 changePageNum(-1);
+                if(bjPage < getMaxPage())  bjPage = getMaxPage();
                 openOrCreatePage();
                 break;
             case R.id.first:
@@ -152,7 +170,8 @@ public class ViewActivity extends Activity {
                 openOrCreatePage();
                 break;
             case R.id.last:
-                openOrCreatePage(getMaxPage());
+                bjPage = getMaxPage();
+                openOrCreatePage();
                 break;
         }
     }
@@ -244,7 +263,7 @@ public class ViewActivity extends Activity {
     //改变页码
     private void changePageNum(int p) {
         if (p < 0) {
-            String s = "update indexTable set status=0 where id >= ?;";
+            String s = "update indexTable set status=0 where id = ?;";
             sql.execSQL(s, new Object[]{bjPage});
         }
 
