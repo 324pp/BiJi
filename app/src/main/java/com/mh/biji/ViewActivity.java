@@ -36,21 +36,26 @@ public class ViewActivity extends Activity {
     private Canvas cvs;
     private Paint linePaint;
 
+    private SharedPreferencesHelper SPHelper;
+
     public void setLineWidth(int lineWidth) {
         if (this.lineWidth == lineWidth) return;
         this.lineWidth = lineWidth;
         linePaint.setStrokeWidth(lineWidth);
+        SPHelper.setInt(Fn.replaceString(bjId, "-", "") + ".lineWidth", lineWidth);
     }
 
     public void setLineColor(int curColor) {
         if (this.curColor == curColor) return;
         this.curColor = curColor;
         linePaint.setColor(curColor);
+        SPHelper.setInt(Fn.replaceString(bjId, "-", "") + ".lineColor", curColor);
     }
 
     public void setBgColor(int bgColor) {
         if (this.bgColor == bgColor) return;
         this.bgColor = bgColor;
+        SPHelper.setInt(Fn.replaceString(bjId, "-", "") + ".bgColor", bgColor);
         cvs.drawColor(bgColor);
         IV.setImageBitmap(baseBitmap);
         openOrCreatePage();
@@ -86,6 +91,11 @@ public class ViewActivity extends Activity {
         bjId = intent.getStringExtra("ID");
         bjPath = intent.getStringExtra("PATH");
         if (bjPath == null || bjPath == "") bjPath = app.getBjPath();
+
+        SPHelper = new SharedPreferencesHelper(this, app.getConfigName());
+        lineWidth = SPHelper.getInt(Fn.replaceString(bjId, "-", "") + ".lineWidth", 2);
+        curColor = SPHelper.getInt(Fn.replaceString(bjId, "-", "") + ".lineColor", Color.BLACK);
+        bgColor = SPHelper.getInt(Fn.replaceString(bjId, "-", "") + ".bgColor", Color.WHITE);
 
         linePaint = new Paint(Paint.DITHER_FLAG);
         linePaint.setAntiAlias(true);
